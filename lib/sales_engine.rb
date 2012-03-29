@@ -1,5 +1,5 @@
+$LOAD_PATH.unshift("./sales_engine")
 require 'csv'
-# require '../data'
 require 'sales_engine/customer'
 require 'sales_engine/transaction'
 require 'sales_engine/merchant'

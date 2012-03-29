@@ -1,3 +1,4 @@
+
 require 'sales_engine/class_methods'
 require "sales_engine/item"
 require "sales_engine/invoice"
@@ -13,7 +14,7 @@ module SalesEngine
     def initialize(attributes = {})
       define_attributes(attributes)
       Database.instance.merchant[id][:self] = self
-      Database.instance.all_merchants[id - 1] = self
+      Database.instance.all_merchants[id-1] = self
     end
 
     def all_merchants

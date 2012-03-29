@@ -30,14 +30,15 @@ module SalesEngine
           end
 
           define_singleton_method("find_all_by_#{attribute}") do |query|
-            instances = Database.instance.send("#{method_name}")
-            results = []
-            instances.each do |id, instance|
-              if instance[:self].send("#{attribute}") == query.to_s
-                results << instance[:self]
-              end
-            end
-            results
+            Database.instance.send("find", method_name,attribute,query)
+            # instances = Database.instance.send("#{method_name}")
+            # results = []
+            # instances.each do |id, instance|
+            #   if instance[:self].send("#{attribute}") == query.to_s
+            #     results << instance[:self]
+            #   end
+            # end
+            # results
           end
 
           define_singleton_method("random") do
@@ -48,33 +49,32 @@ module SalesEngine
         end
       end
     end
-
-    module AccessorBuilder
-      def self.included(base)
-        base.class_eval do
-          self::ATTRIBUTES.each do |attribute|
-            attr_accessor attribute
-          end
-        end
-      end  
-
-      def define_attributes (attributes)  
-        attributes.each do |key, value|
-          if DataCleaner.instance.respond_to?("clean_#{key}")
-            value = DataCleaner.instance.send("clean_#{key}",value)
-          end
-          send("#{key}=",value)
+  end
+  module AccessorBuilder
+    def self.included(base)
+      base.class_eval do
+        self::ATTRIBUTES.each do |attribute|
+          attr_accessor attribute
         end
       end
+    end  
 
+    def define_attributes (attributes)  
+      attributes.each do |key, value|
+        if DataCleaner.instance.respond_to?("clean_#{key}")
+          value = DataCleaner.instance.send("clean_#{key}",value)
+        end
+        send("#{key}=",value)
+      end
     end
+
   end
 
   class DataCleaner
     include Singleton
 
     def clean_id(id)
-      id.only_digits
+      id.only_digits.to_i
     end
 
     def clean_updated_at(date)
@@ -83,6 +83,22 @@ module SalesEngine
 
     def clean_created_at(date)
       Date.parse(date)
+    end
+
+    def clean_customer_id(id)
+      clean_id(id)
+    end
+
+    def clean_invoice_id(id)
+      clean_id(id)
+    end
+
+    def clean_transaction_id(id)
+      clean_id(id)
+    end
+
+    def clean_invoice_item_id(id)
+      clean_id(id)
     end
 
     def clean_merchant_id(id)
